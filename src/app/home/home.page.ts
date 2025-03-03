@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RestService } from '../rest.service';
 import { LoadingController } from '@ionic/angular';
+import { Country } from '../models/country';
 
 
 @Component({
@@ -10,29 +11,35 @@ import { LoadingController } from '@ionic/angular';
   standalone: false,
 })
 export class HomePage implements OnInit {
-  countries: any;
+  countries: Country[] = [];
   errorMessage: string = '';
   constructor(
    public rest: RestService,
    public loadingCtrl: LoadingController,
-  )
-  { }
+  ){ }
+
   ngOnInit() {
   this.getCountries();
   }
+
   async getCountries() {
    const loading = await this.loadingCtrl.create({
    message: 'Loading ...'
    });
    await loading.present();
+   
    await this.rest.getCountries()
-  .subscribe(
-  countries => {
-   this.countries = countries.sort(
-  (a, b) => a.name.official.localeCompare(b.name.official)
-  );
-   loading.dismiss();
-   },
-  error => { this.errorMessage = error as any; loading.dismiss(); });
+      .subscribe(
+        (countries: Country[]) => {
+          this.countries = countries.sort(
+            (a: Country, b: Country) => a.name.official.localeCompare(b.name.official)
+          );
+          loading.dismiss();
+        },
+        error => {
+          this.errorMessage = error as any;
+          loading.dismiss();
+        }
+      );
   }
-  }
+}

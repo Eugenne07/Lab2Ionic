@@ -2,6 +2,7 @@ import { Injectable, NgModule } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { map, catchError, tap } from 'rxjs/operators';
+import { Country } from './models/country';
 
 @Injectable({
   providedIn: 'root'
@@ -24,14 +25,13 @@ export class RestService {
     errMsg = error.message ? error.message : error.toString();
     }
     console.error(errMsg);
-    return throwError(errMsg);
+    return throwError(() => new Error(errMsg));
   }  
     
 
-  getCountries(): Observable<any> {
-    return this.http.get<Response>(this.apiUrl).pipe(
-    map(this.extractData),
-    catchError(this.handleError)
+  getCountries(): Observable<Country[]> {
+    return this.http.get<Country[]>(this.apiUrl).pipe(
+      catchError(this.handleError)
     );
     }
   
